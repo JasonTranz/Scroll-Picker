@@ -1,5 +1,6 @@
 package com.jason.scrollpicker.ui.picker
 
+import android.os.Parcelable
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -42,6 +43,7 @@ import com.jason.scrollpicker.util.DateUtil.formatMonth
 import com.jason.scrollpicker.util.noRippleClickable
 import com.jason.scrollpicker.util.roundTo
 import kotlinx.coroutines.launch
+import kotlinx.parcelize.Parcelize
 import kotlin.math.abs
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -54,7 +56,6 @@ fun ScrollPicker(
     firstOptions: List<BaseScrollOption> = emptyList(),
     secondOptions: List<BaseScrollOption> = emptyList(),
     thirdOptions: List<BaseScrollOption> = emptyList(),
-    paddingValues: PaddingValues = PaddingValues(16.dp),
     properties: PickerProperties = PickerProperties(),
     onItemSelected: (BaseScrollOption, BaseScrollOption, BaseScrollOption) -> Unit
 ) {
@@ -70,9 +71,9 @@ fun ScrollPicker(
     var heightOfView by remember { mutableStateOf(0.dp) }
     val contentPadding by remember { mutableStateOf(itemHeight * (itemCount / 2)) }
 
-    var firstPicked by remember { mutableStateOf(BaseScrollOption()) }
-    var secondPicked by remember { mutableStateOf(BaseScrollOption()) }
-    var thirdPicked by remember { mutableStateOf(BaseScrollOption()) }
+    var firstPicked by rememberSaveable { mutableStateOf(BaseScrollOption()) }
+    var secondPicked by rememberSaveable { mutableStateOf(BaseScrollOption()) }
+    var thirdPicked by rememberSaveable { mutableStateOf(BaseScrollOption()) }
 
     val coroutineScope = rememberCoroutineScope()
 
@@ -159,7 +160,7 @@ fun ScrollPicker(
         modifier = modifier
             .clip(shape = RoundedCornerShape(properties.shapeRadius))
             .background(color = properties.backgroundColor)
-            .padding(paddingValues)
+            .padding(properties.paddingValues)
     ) {
         Box(
             modifier = Modifier
@@ -339,9 +340,14 @@ fun ScrollPicker(
     }
 }
 
+/**
+ * Implement this object if use want customize the input/output object
+ * */
+
+@Parcelize
 open class BaseScrollOption(
     open val label: String = ""
-)
+): Parcelable
 
 data class PickerProperties(
     val itemHeight: Dp = 40.dp,
@@ -357,6 +363,7 @@ data class PickerProperties(
     val backgroundSelectedBox: Color = Color.Gray.copy(0.5f),
     val backgroundColor: Color = Color.White,
     val shapeRadius: Dp = 8.dp,
-    val shapeSelectedBoxRadius: Dp = 4.dp
+    val shapeSelectedBoxRadius: Dp = 4.dp,
+    val paddingValues: PaddingValues = PaddingValues(16.dp),
 )
 

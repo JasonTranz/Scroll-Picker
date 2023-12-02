@@ -11,13 +11,13 @@ object DateUtil {
     private const val SHORT_MONTH_FORMAT = "MM"
     private const val YEAR_FORMAT = "yyyy"
 
-    fun getMonths(year: Int, format: String = LONG_MONTH_FORMAT): List<String> {
+    fun getMonths(year: Int, format: String = LONG_MONTH_FORMAT, allowSelectThroughOnCurrentDate: Boolean = true): List<String> {
         val months = mutableListOf<String>()
         val monthFormatter = SimpleDateFormat(SHORT_MONTH_FORMAT, Locale.getDefault())
         val yearFormatter = SimpleDateFormat(YEAR_FORMAT, Locale.getDefault())
         val monthCalendar = Calendar.getInstance()
 
-        val maxMonth = if (year == yearFormatter.format(monthCalendar.timeInMillis).toIntOrNull()) {
+        val maxMonth = if (year == yearFormatter.format(monthCalendar.timeInMillis).toIntOrNull() && !allowSelectThroughOnCurrentDate) {
             monthFormatter.format(monthCalendar.timeInMillis).toIntOrNull() ?: 0
         } else {
             12
@@ -54,7 +54,7 @@ object DateUtil {
         return years
     }
 
-    fun getDayOfMonth(year: Int, month: Int): List<String> {
+    fun getDayOfMonth(year: Int, month: Int, allowSelectThroughOnCurrentDate: Boolean = true): List<String> {
         val days = mutableListOf<String>()
         val calendar = Calendar.getInstance()
         calendar.set(year, month, 0)
@@ -62,7 +62,7 @@ object DateUtil {
         val monthYear = "$month-$year"
         val currentMonthYear = "${getCurrentMonth()}-${getCurrentYear()}"
 
-        val maxDate = if (monthYear == currentMonthYear) {
+        val maxDate = if (monthYear == currentMonthYear && !allowSelectThroughOnCurrentDate) {
             getCurrentDate()
         } else {
             calendar.getActualMaximum(Calendar.DATE)
@@ -81,13 +81,13 @@ object DateUtil {
         return formatter.format(calendar.timeInMillis).toIntOrNull() ?: 0
     }
 
-    private fun getCurrentMonth(): Int {
+    fun getCurrentMonth(): Int {
         val formatter = SimpleDateFormat(SHORT_MONTH_FORMAT, Locale.getDefault())
         val calendar = Calendar.getInstance()
         return formatter.format(calendar.timeInMillis).toIntOrNull() ?: 0
     }
 
-    private fun getCurrentDate(): Int {
+    fun getCurrentDate(): Int {
         val formatter = SimpleDateFormat(DATE_FORMAT, Locale.getDefault())
         val calendar = Calendar.getInstance()
         return formatter.format(calendar.timeInMillis).toIntOrNull() ?: 0
